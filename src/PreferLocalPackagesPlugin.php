@@ -12,19 +12,48 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class PreferLocalPackagesPlugin implements PluginInterface
 {
-    public function activate(Composer $composer, IOInterface $io)
-    {
-        $composerRequires = array_merge(
+	public function activate(Composer $composer, IOInterface $io)
+	{
+		$composerRequires = array_merge(
 			$composer->getPackage()->getRequires(),
-	        $composer->getPackage()->getDevRequires()
-        );
+			$composer->getPackage()->getDevRequires()
+		);
 		unset($composerRequires['brianhenryie/composer-prefer-local']);
 
-	    $filesystem = new Filesystem();
+		$filesystem = new Filesystem();
 
-	    $parentDirectory = realpath(getcwd() . '/../') . '/';
+		$parentDirectory = realpath(getcwd() . '/../') . '/';
 
-	    $localPackageDirs = array_filter(
+		$localPackageDirs = $this->getLocalPackageDirs($parentDirectory, $filesystem);
+
+		foreach( $composerRequires as $packageName => $composerRequire ) {
+
+			if( !in_array($packageName, $localPackageDirs, true) ){
+				continue;
+			}
+
+			$absolutePath = array_search($packageName, $localPackageDirs, true);
+
+			$repository = $composer->getRepositoryManager()->createRepository(
+				'path',
+				[
+					"type" => "path",
+					"url" => $absolutePath,
+				]
+			);
+			$composer->getRepositoryManager()->addRepository($repository);
+
+			// TODO: should this be shown outside install and update invocations?
+			$io->write("Using {$absolutePath} for {$packageName}.");
+		}
+	}
+
+	/**
+	 * array < absolutePath, packageName >
+	 */
+	protected function getLocalPackageDirs(string $parentDirectory, Filesystem $filesystem): array
+	{
+		$localPackageDirs = array_filter(
 			array_filter(
 				array_map(
 					function($dir) use ($parentDirectory) {
@@ -45,7 +74,7 @@ class PreferLocalPackagesPlugin implements PluginInterface
 			function($dir) use ($filesystem, $parentDirectory) {
 				return $filesystem->exists( $dir . 'composer.json');
 			}
-	    );
+		);
 
 		foreach($localPackageDirs as $index => $localPackageDir) {
 			unset($localPackageDirs[$index]);
@@ -58,34 +87,16 @@ class PreferLocalPackagesPlugin implements PluginInterface
 			$localPackageDirs[$localPackageDir] = $packageComposer['name'];
 		}
 
-	    foreach( $composerRequires as $packageName => $composerRequire ) {
+		return $localPackageDirs;
+	}
 
-			if( !in_array($packageName, $localPackageDirs, true) ){
-				continue;
-			}
+	public function deactivate(Composer $composer, IOInterface $io)
+	{
+		// TODO: Implement deactivate() method.
+	}
 
-			$absolutePath = array_search($packageName, $localPackageDirs, true);
-
-	        $repository = $composer->getRepositoryManager()->createRepository(
-		        'path',
-					[
-						"type" => "path",
-						"url" => $absolutePath,
-		            ]
-	        );
-			$composer->getRepositoryManager()->addRepository($repository);
-
-	        $io->write("Using {$absolutePath} for {$packageName}.");
-        }
-    }
-
-    public function deactivate(Composer $composer, IOInterface $io)
-    {
-        // TODO: Implement deactivate() method.
-    }
-
-    public function uninstall(Composer $composer, IOInterface $io)
-    {
-        // TODO: Implement uninstall() method.
-    }
+	public function uninstall(Composer $composer, IOInterface $io)
+	{
+		// TODO: Implement uninstall() method.
+	}
 }
