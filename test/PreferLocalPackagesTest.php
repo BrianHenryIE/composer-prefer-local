@@ -38,7 +38,7 @@ EOD;
 
 		$this->runComposer("composer install");
 		$this->runComposer("composer config allow-plugins.brianhenryie/composer-prefer-local true");
-		$this->runComposer("composer require brianhenryie/composer-prefer-local:dev-main --dev");
+		$this->runComposer("composer require brianhenryie/composer-prefer-local:dev-master --dev");
 	}
 
 	public function test_it_works(): void {
