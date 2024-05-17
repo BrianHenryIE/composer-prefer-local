@@ -48,15 +48,14 @@ class PreferLocalPackagesPlugin implements PluginInterface
 	    );
 
 		foreach($localPackageDirs as $index => $localPackageDir) {
+			unset($localPackageDirs[$index]);
+			$packageComposer = json_decode(file_get_contents($localPackageDir . 'composer.json'), JSON_THROW_ON_ERROR);
 			if(!isset($packageComposer['name'])){
 				// How does this happen?
 				// A `composer.json` without a `name` key?
-				unset($localPackageDirs[$index]);
 				continue;
 			}
-			$packageComposer = json_decode(file_get_contents($localPackageDir . 'composer.json'), JSON_THROW_ON_ERROR);
 			$localPackageDirs[$localPackageDir] = $packageComposer['name'];
-			unset($localPackageDirs[$index]);
 		}
 
 	    foreach( $composerRequires as $packageName => $composerRequire ) {
