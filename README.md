@@ -6,6 +6,6 @@ When a package is available in a sibling or sub-directory, use that instead of P
 composer config minimum-stability dev
 composer config prefer-stable true
 
-composer config allow-plugins.brianhenryie/composer-prefer-local
+composer config allow-plugins.brianhenryie/composer-prefer-local true
 composer require --dev brianhenryie/composer-prefer-local
 ```
