@@ -26,13 +26,7 @@ class PreferLocalPackagesPlugin implements PluginInterface
 
 		$localPackageDirs = $this->getLocalPackageDirs($parentDirectory, $filesystem);
 
-		foreach( $composerRequires as $packageName => $composerRequire ) {
-
-			if( !in_array($packageName, $localPackageDirs, true) ){
-				continue;
-			}
-
-			$absolutePath = array_search($packageName, $localPackageDirs, true);
+		foreach( $localPackageDirs as $absolutePath => $packageName ) {
 
 			$repository = $composer->getRepositoryManager()->createRepository(
 				'path',
