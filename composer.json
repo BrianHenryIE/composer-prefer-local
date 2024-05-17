@@ -1,0 +1,25 @@
+{
+    "name":"brianhenryie/composer-prefer-local",
+    "autoload": {
+        "psr-4": {
+            "BrianHenryIE\\ComposerPreferLocal\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BrianHenryIE\\ComposerPreferLocal\\": "test"
+        }
+    },
+    "require": {
+      "composer-plugin-api": "^2.0",
+      "ext-json": "*"
+    },
+    "require-dev": {
+        "composer/composer": "^2.6",
+        "phpunit/phpunit": "^9.0"
+    },
+    "type": "composer-plugin",
+    "extra": {
+        "class": "\\BrianHenryIE\\ComposerPreferLocal\\PreferLocalPackagesPlugin"
+    }
+}
