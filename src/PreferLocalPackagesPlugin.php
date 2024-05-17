@@ -28,6 +28,8 @@ class PreferLocalPackagesPlugin implements PluginInterface
 
 		foreach( $localPackageDirs as $absolutePath => $packageName ) {
 
+			// TODO: Compare with published versions, so only communicate when the local version is different.
+
 			$repository = $composer->getRepositoryManager()->createRepository(
 				'path',
 				[
