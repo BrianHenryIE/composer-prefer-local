@@ -26,6 +26,8 @@ class PreferLocalPackagesPlugin implements PluginInterface
 
 		$localPackageDirs = $this->getLocalPackageDirs($parentDirectory, $filesystem);
 
+        $nonRequiredPackages = array();
+
 		foreach( $localPackageDirs as $absolutePath => $packageName ) {
 
 			// TODO: Compare with published versions, so only communicate when the local version is different.
@@ -40,8 +42,16 @@ class PreferLocalPackagesPlugin implements PluginInterface
 			$composer->getRepositoryManager()->prependRepository($repository);
 
 			// TODO: should this be shown outside install and update invocations?
-			$io->write("Using {$absolutePath} for {$packageName}.");
+            if(isset($composerRequires[$packageName])){
+                $io->write("Using {$absolutePath} for {$packageName}.");
+            } else {
+                $nonRequiredPackages[] = $packageName;
+            }
 		}
+
+        if(count($nonRequiredPackages) > 0){
+            $io->write('Additional ' . count($nonRequiredPackages) . " local packages not directly required in composer.json which may be used.");
+        }
 	}
 
 	/**
