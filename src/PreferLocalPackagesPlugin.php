@@ -37,7 +37,7 @@ class PreferLocalPackagesPlugin implements PluginInterface
 					"url" => $absolutePath,
 				]
 			);
-			$composer->getRepositoryManager()->addRepository($repository);
+			$composer->getRepositoryManager()->prependRepository($repository);
 
 			// TODO: should this be shown outside install and update invocations?
 			$io->write("Using {$absolutePath} for {$packageName}.");
